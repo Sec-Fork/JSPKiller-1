@@ -14,11 +14,21 @@
 
 ## Quick Start
 
-目前只做了普通反射JSP马的检测，其他方式后续更新
+目前支持以下两种检测，其他方式后续更新
+
+1. 反射构造`Runtime.exec`的`Webshell`
+2. 使用`BCEL ClassLoader`加载恶意字节码的`Webshell`（非反射方式）
 
 命令：
 
-`java -jar JSPKiller.jar -f 1.jsp`
+`java -jar JSPKiller.jar -f 1.jsp -m rb`
+
+- 使用-f参数指定检测`JSP`文件
+- 使用-m参数指定检测模块：r表示反射型；b表示BCEL型（可多选）
+
+提供了检测案例
+- `jsp/test-1.jsp`-`jsp/test-4.jsp`用于测试反射马
+- `jsp/bcel-1.jsp`-`jsp/bcel-4.jsp`用于测试BCEL马
 
 如果发生空指针异常或编译报错，参考以下
 
@@ -30,4 +40,4 @@
 
 ## 效果
 
-![](/img/01.png)
+![](/img/1.png)
