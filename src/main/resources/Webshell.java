@@ -4,7 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 
-@SuppressWarnings("unchecked")
 public class Webshell {
     public static void invoke(HttpServletRequest request,
                               HttpServletResponse response,

@@ -6,26 +6,25 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.JSRInlinerAdapter;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class ReflectionShellClassVisitor extends ClassVisitor {
-    private Map<String, List<Boolean>> analysisData;
+public class BcelShellClassVisitor extends ClassVisitor {
+    private final Map<String, Object> analysisData;
 
     private String name;
     private String signature;
     private String superName;
     private String[] interfaces;
 
-    public ReflectionShellClassVisitor() {
+    public BcelShellClassVisitor() {
         super(Opcodes.ASM8);
         this.analysisData = new HashMap<>();
     }
 
-    public Map<String, List<Boolean>> getAnalysisData() {
+
+    public Map<String, Object> getAnalysisData() {
         return analysisData;
     }
-
 
     @Override
     public void visit(int version, int access, String name, String signature,
@@ -42,12 +41,12 @@ public class ReflectionShellClassVisitor extends ClassVisitor {
                                      String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
         if (name.equals("invoke")) {
-            ReflectionShellMethodAdapter reflectionShellMethodAdapter = new ReflectionShellMethodAdapter(
+            BcelShellMethodAdapter bcelShellMethodAdapter = new BcelShellMethodAdapter(
                     Opcodes.ASM8,
                     mv, this.name, access, name, descriptor, signature, exceptions,
                     analysisData
             );
-            return new JSRInlinerAdapter(reflectionShellMethodAdapter,
+            return new JSRInlinerAdapter(bcelShellMethodAdapter,
                     access, name, descriptor, signature, exceptions);
         }
         return mv;

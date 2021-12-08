@@ -12,6 +12,9 @@ public class Command {
     @Parameter(names = {"-f", "--file"}, description = "Webshell File")
     public String file;
 
+    @Parameter(names = {"-m", "--module"}, description = "Scan Module")
+    public String module;
+
     @Parameter(names = {"--debug"}, description = "Debug")
     public boolean debug;
 }
