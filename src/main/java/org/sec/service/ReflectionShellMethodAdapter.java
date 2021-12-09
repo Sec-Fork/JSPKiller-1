@@ -58,6 +58,46 @@ public class ReflectionShellMethodAdapter extends CoreMethodAdapter<String> {
             boolean invoke = name.equals("invoke") &&
                     owner.equals("java/lang/reflect/Method") &&
                     desc.equals("(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;");
+            boolean append = name.equals("append") &&
+                    owner.equals("java/lang/StringBuilder") &&
+                    desc.equals("(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            boolean toString = name.equals("toString") &&
+                    owner.equals("java/lang/StringBuilder") &&
+                    desc.equals("()Ljava/lang/String;");
+            if (append) {
+                if (operandStack.get(0).size() != 0) {
+                    String before = null;
+                    if (operandStack.get(1).size() != 0) {
+                        before = new ArrayList<>(operandStack.get(1)).get(0);
+                    }
+                    if (before == null) {
+                        before = new ArrayList<>(operandStack.get(0)).get(0);
+                    } else {
+                        before += new ArrayList<>(operandStack.get(0)).get(0);
+                    }
+                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                    operandStack.get(0).add(before);
+                    return;
+                }
+            }
+            if (toString) {
+                if (operandStack.get(0).size() != 0) {
+                    List<String> data = new ArrayList<>(operandStack.get(0));
+                    StringBuilder builder = new StringBuilder();
+                    for (String s : data) {
+                        builder.append(s);
+                    }
+                    String result = builder.toString();
+                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                    if (result.equals("exec")) {
+                        operandStack.get(0).add("ldc-exec");
+                    }
+                    if (result.equals("getRuntime")) {
+                        operandStack.get(0).add("ldc-get-runtime");
+                    }
+                    return;
+                }
+            }
             if (getMethod) {
                 if (operandStack.get(1).contains("ldc-get-runtime")) {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
@@ -81,6 +121,7 @@ public class ReflectionShellMethodAdapter extends CoreMethodAdapter<String> {
                     }
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                     logger.info("-> method exec invoked");
+                    return;
                 }
             }
         }
@@ -116,6 +157,11 @@ public class ReflectionShellMethodAdapter extends CoreMethodAdapter<String> {
         if (cst.equals("exec")) {
             super.visitLdcInsn(cst);
             operandStack.get(0).add("ldc-exec");
+            return;
+        }
+        if (cst instanceof String) {
+            super.visitLdcInsn(cst);
+            operandStack.get(0).add((String) cst);
             return;
         }
         super.visitLdcInsn(cst);
